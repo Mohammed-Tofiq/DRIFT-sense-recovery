@@ -1,6 +1,10 @@
-step1 :- run generate_dataset.py           // create generate_dataset.py
+80% accuracy using Nearest Centroid Classifier (NCC) and classical mathematics
 
-step2 :- run inference.py                 // create inference.py
+
+
+step1 :- run generate_dataset.py               ======  // create generate_dataset.py
+
+step2 :- run inference.py              ========   // create inference.py
 
 step3 :- !python generate_dataset.py
 
