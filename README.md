@@ -1,10 +1,10 @@
 80% accuracy using Nearest Centroid Classifier (NCC) and classical mathematics
 
-=========  timepass karta karta new formula bana deya  =========
+=========  timepass karta karta new formula bana deya 😎 =========
 
 this is just for learning and understanding the problem 
 
-final code submit soon :-----(xx/xx/xxxx )  DATE NAHI PATA
+final code submit soon 📆 :-----(xx/xx/xxxx )  DATE NAHI PATA ✌️
 
 
 
