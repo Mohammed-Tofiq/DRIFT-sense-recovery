@@ -1,0 +1,14 @@
+{
+  "n_pairs": 200,
+  "mean_error_px": 3.8473823189343896,
+  "median_error_px": 1.8405643174552972,
+  "p95_error_px": 2.7153238844714265,
+  "pass_rate_at_5px": 0.995,
+  "pass_rate_at_4px": 0.995,
+  "pass_rate_at_2px": 0.615,
+  "pass_rate_at_1px": 0.13,
+  "mean_latency_ms": 14.88177164690569,
+  "median_latency_ms": 12.251479551196098,
+  "worst_pair_id": "72",
+  "worst_pair_error_px": 414.28549040300425
+}
