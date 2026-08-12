@@ -1,7 +1,8 @@
 """
 generate_dataset.py
 ====================
-Bulk synthetic-data generator for the Drift-Sense navigation-error-recovery
+Bulk synthetic-data generator 
+for the Drift-Sense navigation-error-recovery
 problem.
 """
 
