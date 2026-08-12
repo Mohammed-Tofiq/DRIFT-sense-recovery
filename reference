@@ -1,0 +1,33 @@
+Project: Drift-Sense Navigation-Error Recovery
+Author: Mohammed Tofiq
+
+
+As required by the Applied Materials evaluation rubric, the following credible public literature was used to justify
+the synthetic data generation (DRAM/FinFET procedural structures, SEM noise modeling) and the localization methodology used in this submission.
+
+1. Semiconductor Structures (DRAM & FinFET)
+Kuhn, K. J. (2012). "Considerations for Ultimate CMOS Scaling." IEEE Transactions on Electron Devices, 59(7), 1813-1828.
+
+Justification: 
+Used to model the procedural FinFET grid patterns, specifically the orthogonal relationship between fin and gate runs, and the typical pitch/width scaling ratios.
+
+2.Cho, M., et al. (2014). "Patterning technology for advanced FinFET and DRAM." Proceedings of SPIE - The International Society for Optical Engineering.
+
+Justification:
+Provided the foundational public knowledge for the dram_grid and via_array layouts, defining the periodic active area and wordline cuts simulated in the dataset generator.
+
+3.SEM Image Formation & Noise Degradation
+Reimer, L. (1998). "Scanning Electron Microscopy: Physics of Image Formation and Microanalysis." Springer Series in Optical Sciences.
+
+Justification: 
+This text details the physics of secondary electron emission. It was used to justify the use of Poisson (shot) noise and Gaussian detector noise to simulate realistic scanning electron microscope (SEM) degradation in the synthetic data.
+
+4.Sim, K., et al. (2004). "Automatic defect classification for SEM wafer inspection." IEEE International Symposium on Semiconductor Manufacturing.
+
+Justification: 
+Informed the shading and contrast variations applied to the images, mathematically representing charging artifacts and uneven electron-beam illumination commonly seen during wafer inspection.
+
+5.Zitová, B., & Flusser, J. (2003). "Image registration methods: a survey." Image and Vision Computing, 21(11), 977-1000.
+
+Justification: 
+Served as the literature basis for the Normalized Cross-Correlation (NCC) template matching approach and the application of rigid geometric augmentations (9:1 to 11:1 scale variance and ±2° rotation) required to simulate stage drift.
