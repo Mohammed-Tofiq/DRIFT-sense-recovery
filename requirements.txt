@@ -1,3 +1,6 @@
-torch
 numpy
+opencv-python
+torch
 pandas
+matplotlib
+tqdm
