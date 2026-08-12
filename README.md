@@ -1,4 +1,4 @@
-#Drift-Sense: AI-Powered Navigation-Error Recovery
+# Drift-Sense: AI-Powered Navigation-Error Recovery
 ##Hackathon: Applied Materials Problem Statement (SEMICON India 2026)
 
 ###Objective: Automatically locate a high-resolution (100x) reference pattern inside a larger, noisier low-resolution (10x) search image to correct wafer inspection stage drift.
