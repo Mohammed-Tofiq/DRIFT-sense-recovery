@@ -163,34 +163,69 @@ def add_shading(img: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     return img * (1.0 + strength * grad)
 
 def add_sem_noise(img: np.ndarray, rng: np.random.Generator,
-                   poisson_peak=(25, 60), gaussian_sigma=(0.01, 0.035)) -> np.ndarray:
+                   poisson_peak=(25, 60), gaussian_sigma=(0.01, 0.035)):
     img = np.clip(img, 0.0, 1.0)
-    peak = rng.uniform(*poisson_peak)
+    peak = float(rng.uniform(*poisson_peak))
     noisy = rng.poisson(img * peak) / peak
-    sigma = rng.uniform(*gaussian_sigma)
+    sigma = float(rng.uniform(*gaussian_sigma))
     noisy = noisy + rng.normal(0.0, sigma, size=img.shape)
-    return np.clip(noisy, 0.0, 1.0)
+    return np.clip(noisy, 0.0, 1.0), peak, sigma
 
-def generate_pair(rng: np.random.Generator):
+def generate_pair(rng: np.random.Generator, seed: int):
     params = random_pattern_params(rng)
     landmark_type = rng.choice(LANDMARK_BY_PATTERN[params.kind])
+    
+    # 1. Dynamic scale (9:1 to 11:1)
+    scale = float(rng.uniform(9.0, 11.0))
+    ref_fov = SEARCH_FOV / scale
+    
     raw_center = (rng.uniform(EDGE_MARGIN, SEARCH_FOV - EDGE_MARGIN),
                   rng.uniform(EDGE_MARGIN, SEARCH_FOV - EDGE_MARGIN))
     center = snap_to_feature(raw_center, landmark_type, params)
 
     search_layout = render_pattern(_SEARCH_XX, _SEARCH_YY, params)
     search_layout = inject_landmark(search_layout, _SEARCH_XX, _SEARCH_YY, center, landmark_type, params, rng)
-    search_img = add_sem_noise(add_shading(search_layout, rng), rng)
+    
+    # 2. Apply 1-2 degree rotation (positive or negative)
+    rot_deg = float(rng.uniform(-2.0, 2.0))
+    M_rot = cv2.getRotationMatrix2D((SEARCH_FOV / 2, SEARCH_FOV / 2), rot_deg, 1.0)
+    search_layout = cv2.warpAffine(search_layout, M_rot, (IMG_SIZE, IMG_SIZE), 
+                                   flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    
+    # Rotate the true center coordinate to match the transformed image
+    pt = np.array([center[0], center[1], 1.0])
+    new_center = M_rot.dot(pt)
+    center = (float(new_center[0]), float(new_center[1]))
 
-    xx_r, yy_r = coord_grid(center, REF_FOV, IMG_SIZE)
+    search_img = add_shading(search_layout, rng)
+    search_img, s_peak, s_sigma = add_sem_noise(search_img, rng)
+
+    xx_r, yy_r = coord_grid(center, ref_fov, IMG_SIZE)
     ref_layout = render_pattern(xx_r, yy_r, params)
     ref_layout = inject_landmark(ref_layout, xx_r, yy_r, center, landmark_type, params, rng)
-    ref_img = add_sem_noise(add_shading(ref_layout, rng), rng)
+    
+    ref_img = add_shading(ref_layout, rng)
+    ref_img, r_peak, r_sigma = add_sem_noise(ref_img, rng)
 
     search_u8 = (search_img * 255).astype(np.uint8)
     ref_u8 = (ref_img * 255).astype(np.uint8)
-    return search_u8, ref_u8, center, params.kind, landmark_type
-
+    
+    # 3. Compile all required metadata
+    metadata = {
+        "center_x": center[0],
+        "center_y": center[1],
+        "pattern": params.kind,
+        "landmark": landmark_type,
+        "scale": scale,
+        "rotation_deg": rot_deg,
+        "search_noise_peak": s_peak,
+        "search_noise_sigma": s_sigma,
+        "ref_noise_peak": r_peak,
+        "ref_noise_sigma": r_sigma,
+        "seed": seed
+    }
+    
+    return search_u8, ref_u8, metadata
 # --------------------------------------------------------------------------
 # Multiprocessing worker pool
 # --------------------------------------------------------------------------
@@ -208,12 +243,11 @@ def _init_worker():
 
 def _worker_generate(args):
     i, seed, split, out_root_str = args
-    # No lazy-init check needed here: Pool(initializer=_init_worker) already
-    # guarantees _init_module_level_grids() has run in this process before
-    # this function is ever called.
     out_root = Path(out_root_str)
     rng = np.random.default_rng(seed)
-    search_img, ref_img, center, pattern, landmark = generate_pair(rng)
+    
+    # Pass seed into the generator
+    search_img, ref_img, metadata = generate_pair(rng, seed)
 
     fname = f"{i:06d}.png"
     search_path = f"{split}/search/{fname}"
@@ -222,15 +256,15 @@ def _worker_generate(args):
     cv2.imwrite(str(out_root / search_path), search_img)
     cv2.imwrite(str(out_root / ref_path), ref_img)
 
-    return {
+    # Merge paths with the metadata dictionary
+    row = {
         "id": i,
         "search_path": search_path,
         "ref_path": ref_path,
-        "center_x": center[0],
-        "center_y": center[1],
-        "pattern": pattern,
-        "landmark": landmark,
     }
+    row.update(metadata)
+    
+    return row
 
 # --------------------------------------------------------------------------
 # Bulk generation
