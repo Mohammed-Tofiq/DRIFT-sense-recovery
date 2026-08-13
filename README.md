@@ -51,6 +51,18 @@ pip install -r requirements.txt
 ```
 
 # 🚀 How to Run the Code (Step-by-Step)
+
+## ⚖️ Evaluation Instructions (For Judges)
+
+This repository supports both batch evaluation on a full dataset and one-off inference for single image pairs.
+
+### 1. Evaluate a Full Custom Dataset
+To run the standard evaluation on your own dataset, use the `--data-dir` argument. 
+*(Note: Your dataset folder must contain the images and the corresponding split CSV file, e.g., `val.csv`, formatted identically to the provided sample data).*
+
+```bash
+python localize.py --data-dir /path/to/your/custom_dataset --split val
+```
 ### Step 1: Generate the Synthetic Dataset
 Run the data generator to create realistic grayscale SEM image pairs (DRAM, FinFET, and Via Arrays) with noise, shading, and dynamic scale/rotation augmentations.
 ```text
