@@ -287,21 +287,6 @@ def evaluate(data_dir: str, split: str, weights_path: str, out_dir: str,
     pass_2px = float((errors_arr <= 2.0).mean())
     pass_1px = float((errors_arr <= 1.0).mean())
 
-    # NEW: Explicit hardware and timing method prints required by checklist
-    print(f"Hardware           : {device.type.upper()} Acceleration")
-    print(f"Timing Method      : Python time.perf_counter()")
-    print("-" * 40)
-    print(f"n_pairs            : {len(rows)}")
-    print(f"mean error (px)    : {errors_arr.mean():.3f}")
-    print(f"median error (px)  : {np.median(errors_arr):.3f}")
-    print(f"p95 error (px)     : {np.percentile(errors_arr, 95):.3f}")
-    print(f"pass @ 5px         : {pass_5px * 100:.1f}%")
-    print(f"pass @ 4px         : {pass_4px * 100:.1f}%")
-    print(f"pass @ 2px         : {pass_2px * 100:.1f}%")
-    print(f"pass @ 1px         : {pass_1px * 100:.1f}%")
-    print(f"mean latency (ms)  : {latencies_arr.mean():.3f}")
-    print(f"median latency(ms) : {np.median(latencies_arr):.3f}")
-
     out_path = Path(out_dir)
     out_path.mkdir(parents=True, exist_ok=True)
     
@@ -312,12 +297,46 @@ def evaluate(data_dir: str, split: str, weights_path: str, out_dir: str,
             writer = csv.DictWriter(f, fieldnames=manifest_data[0].keys())
             writer.writeheader()
             writer.writerows(manifest_data)
-        print(f"Predictions CSV    -> {csv_path}")
 
     overlay_path = out_path / f"worst_pair_{worst['id']}_err{worst['error']:.1f}px.png"
     save_failure_overlay(worst["search_img"], worst["pred"], worst["gt"], worst["error"],
                           str(overlay_path), pair_id=worst["id"])
-    print(f"worst-pair overlay -> {overlay_path}")
+
+    # ---------------------------------------------------------
+    # NEW PRESENTATIONAL TERMINAL OUTPUT
+    # ---------------------------------------------------------
+    print("\n" + "═" * 55)
+    print(" 🚀 DRIFT-SENSE EVALUATION REPORT")
+    print("═" * 55)
+    
+    print(" 💻 SYSTEM CONFIGURATION")
+    print(f"    Hardware         : {device.type.upper()} Acceleration")
+    print(f"    Timing Method    : Python time.perf_counter()")
+    print(f"    Total Pairs      : {len(rows)}")
+    print("-" * 55)
+    
+    print(" 🎯 ERROR STATISTICS (Pixels)")
+    print(f"    Mean Error       : {errors_arr.mean():.3f} px")
+    print(f"    Median Error     : {np.median(errors_arr):.3f} px")
+    print(f"    95th Percentile  : {np.percentile(errors_arr, 95):.3f} px")
+    print("-" * 55)
+    
+    print(" ✅ ACCURACY & PASS RATES")
+    print(f"    Pass @ 5px       : {pass_5px * 100:>5.1f}%")
+    print(f"    Pass @ 4px       : {pass_4px * 100:>5.1f}%")
+    print(f"    Pass @ 2px       : {pass_2px * 100:>5.1f}%")
+    print(f"    Pass @ 1px       : {pass_1px * 100:>5.1f}%")
+    print("-" * 55)
+    
+    print(" ⚡ PERFORMANCE LATENCY")
+    print(f"    Mean Latency     : {latencies_arr.mean():.2f} ms/pair")
+    print(f"    Median Latency   : {np.median(latencies_arr):.2f} ms/pair")
+    print("-" * 55)
+    
+    print(" 💾 ARTIFACTS SAVED")
+    print(f"    Predictions CSV  -> {csv_path.name}")
+    print(f"    Worst-case Image -> {overlay_path.name}")
+    print("═" * 55 + "\n")
 
     summary = {
         "hardware": device.type.upper(),
