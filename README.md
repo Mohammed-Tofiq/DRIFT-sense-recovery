@@ -35,6 +35,17 @@ submission/
 └── src/                                # Source code for training
     └── dl_training.py
 ```
+### 📁 Required Dataset Structure
+If you are evaluating a custom dataset using `--data-dir`, please ensure your folder is structured exactly like this before running the script:
+```
+custom_dataset/
+│
+└── val/
+    ├── labels.csv       <-- Must be named labels.csv
+    ├── ref_1.png
+    ├── search_1.png
+    └── ...
+```
 # ⚙️ Environment Setup & Hardware
 This code is written in Python and uses PyTorch. It is optimized to run dynamically on CUDA (NVIDIA GPUs), MPS (Apple Silicon / M-Series Chips), or standard CPUs.
 
