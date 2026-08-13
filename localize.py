@@ -20,6 +20,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import glob 
 
 DEFAULT_WEIGHTS = "drift_sense_model.pth"
 DEFAULT_DEVICE = torch.device(
@@ -345,14 +346,19 @@ def main():
     parser.add_argument("--weights", type=str, default=DEFAULT_WEIGHTS)
     parser.add_argument("--out-dir", type=str, default="eval_out")
     
-    # NEW CLI ARGUMENTS FOR REAL-WORLD INFERENCE
+    # CLI ARGUMENTS FOR REAL-WORLD INFERENCE
     parser.add_argument("--ref-img", type=str, default=None,
-                         help="Path to a reference image (used with --search-img for one-off inference)")
+                         help="Path to a reference image")
     parser.add_argument("--search-img", type=str, default=None,
-                         help="Path to a search image (used with --ref-img for one-off inference)")
+                         help="Path to a search image")
+    
+    # CLI ARGUMENT FOR BATCH FOLDER (No CSV)
+    parser.add_argument("--batch-dir", type=str, default=None,
+                         help="Path to a folder of images to evaluate without a CSV")
+                         
     args = parser.parse_args()
 
-    # REAL-WORLD INFERENCE MODE (No CSV required)
+    # 1. REAL-WORLD INFERENCE MODE (Single Pair, No CSV)
     if args.ref_img or args.search_img:
         if not (args.ref_img and args.search_img):
             parser.error("--ref-img and --search-img must be provided together")
@@ -368,8 +374,44 @@ def main():
         cx, cy = match_drift(ref_img, search_img, args.weights)
         print(f"predicted (x, y): ({cx:.3f}, {cy:.3f})")
         return
+    
+    # 2. BATCH FOLDER MODE (No CSV)
+    if args.batch_dir:
+        if not os.path.exists(args.batch_dir):
+            print(f"Error: Directory {args.batch_dir} not found.")
+            return
+            
+        print(f"Evaluating folder: {args.batch_dir} (No CSV mode)")
+        ref_images = glob.glob(os.path.join(args.batch_dir, "*ref*.png")) 
+        
+        for ref_path in ref_images:
+            search_path = ref_path.replace("ref", "search") 
+            
+            if os.path.exists(search_path):
+                r_img = cv2.imread(ref_path, cv2.IMREAD_GRAYSCALE)
+                s_img = cv2.imread(search_path, cv2.IMREAD_GRAYSCALE)
+                
+                cx, cy = match_drift(r_img, s_img, args.weights)
+                print(f"Pair {os.path.basename(ref_path)} -> predicted (x, y): ({cx:.3f}, {cy:.3f})")
+            else:
+                print(f"Warning: Could not find matching search image for {ref_path}")
+                
+        return
 
-    # STANDARD EVALUATION MODE (Uses CSV)
+    # 3. STANDARD EVALUATION MODE (Uses CSV) - WITH SAFETY CHECK
+    expected_csv_path = Path(args.data_dir) / args.split / "labels.csv"
+    
+    if not expected_csv_path.exists():
+        print(f"\n ERROR: Could not find the dataset CSV at '{expected_csv_path}'")
+        print("Please ensure your custom dataset follows this exact directory structure:")
+        print(f"  {args.data_dir}/")
+        print(f"    └── {args.split}/")
+        print("        ├── labels.csv")
+        print("        ├── (your reference images)")
+        print("        └── (your search images)\n")
+        print("Alternatively, use --batch-dir to evaluate a folder without a CSV.")
+        return 
+
     evaluate(args.data_dir, args.split, args.weights, args.out_dir)
 
 if __name__ == "__main__":
