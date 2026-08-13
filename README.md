@@ -1,4 +1,4 @@
-# * DRIFT-SENSE: AI-POWERED NAVIGATION-ERROR RECOVERY FOR WAFER INSPECTION TOOLS
+# DRIFT-SENSE: AI-POWERED NAVIGATION-ERROR RECOVERY FOR WAFER INSPECTION TOOLS
 ##Hackathon: Applied Materials Problem Statement (SEMICON India 2026)
 
 ## Objective: 
@@ -11,7 +11,7 @@ This repository contains a complete, end-to-end deep learning pipeline to solve 
 
 Scale & Rotation Robustness: The model is trained on dynamically generated synthetic data with scales ranging from 9:1 to 11:1 and random rotations of ±2°, preventing overfitting to a fixed 10x scale.
 
-###Siamese Architecture: 
+### Siamese Architecture: 
 A custom CNN backbone extracts deep features from both images and projects them into a shared embedding space.
 
 ### Tie-Breaker Logic:
@@ -23,6 +23,7 @@ Coordinate System: Adheres strictly to the standard image coordinate system: Ori
 The folder structure strictly follows the recommended hackathon guidelines:
 
 Plaintext
+```
 submission/
 ├── README.md                           # This file
 ├── requirements.txt                    # Python dependencies
@@ -35,6 +36,7 @@ submission/
 │   └── drift_sense_model.pth           
 └── src/                                # Source code for training
     └── dl_training.py
+```
 # ⚙️ Environment Setup & Hardware
 This code is written in Python and uses PyTorch. It is optimized to run dynamically on CUDA (NVIDIA GPUs), MPS (Apple Silicon / M-Series Chips), or standard CPUs.
 
