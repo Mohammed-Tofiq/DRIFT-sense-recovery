@@ -63,6 +63,12 @@ To run the standard evaluation on your own dataset, use the `--data-dir` argumen
 ```bash
 python localize.py --data-dir /path/to/your/custom_dataset --split val
 ```
+2. Quick Test (Single Image Pair)
+If you want to test the drift matching on a single pair of images without setting up a CSV, you can use the real-world inference mode:
+
+Bash
+python localize.py --ref-img /path/to/reference.jpg --search-img /path/to/search.jpg
+
 ### Step 1: Generate the Synthetic Dataset
 Run the data generator to create realistic grayscale SEM image pairs (DRAM, FinFET, and Via Arrays) with noise, shading, and dynamic scale/rotation augmentations.
 ```text
