@@ -99,7 +99,9 @@ python localize.py --ref-img path/to/reference.png --search-img path/to/search.p
 Output: Prints the exact predicted (x, y) sub-pixel coordinates of the target center in the terminal.
 
 # ⚠️ Assumptions & LimitationsInput Format:
-The model expects $1000 \times 1000$ grayscale images.Nominal Scale: While the model is robust to 9x-11x variations, the inference pipeline actively resizes the reference image by a hardcoded nominal factor of 10.0 to force scale-invariant feature matching.Device Fallback: If a dedicated GPU (CUDA/MPS) is not detected, the code will seamlessly fall back to CPU execution, which will increase latency.
+The model expects $1000 \times 1000$ grayscale images.Nominal Scale:
+While the model is robust to 9x-11x variations, the inference pipeline actively resizes the reference image by a hardcoded nominal factor of 10.0 to force scale-invariant feature matching.
+Device Fallback: If a dedicated GPU (CUDA/MPS) is not detected, the code will seamlessly fall back to CPU execution, which will increase latency.
 
 
 
