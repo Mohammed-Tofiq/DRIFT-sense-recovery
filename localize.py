@@ -22,7 +22,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import glob 
 
-DEFAULT_WEIGHTS = "drift_sense_model.pth"
+DEFAULT_WEIGHTS = "model/drift_sense_model.pth"
 DEFAULT_DEVICE = torch.device(
     "cuda" if torch.cuda.is_available() else
     "mps" if torch.backends.mps.is_available() else
