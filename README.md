@@ -55,7 +55,7 @@ pip install -r requirements.txt
 ### ⚖️ Evaluation Instructions (For Judges)
 This repository is designed for easy evaluation. You can test custom data in three different ways depending on your preferred format.
 
-1. Batch Folder Mode (Easiest)
+### 1. Batch Folder Mode (Easiest)
 If you have a folder of images without a CSV file, use this mode. The script will automatically pair files containing ref and search in their names.
 
 ```
@@ -75,7 +75,7 @@ custom_dataset/
     ├── ref_1.png
     └── search_1.png
 ```
-3. Quick Test (Single Image Pair)
+### 3. Quick Test (Single Image Pair)
 Test the drift matching on a single pair of images via the command line:
 ```
 python localize.py --ref-img /path/to/reference.png --search-img /path/to/search.png --weights model/drift_sense_model.pth
